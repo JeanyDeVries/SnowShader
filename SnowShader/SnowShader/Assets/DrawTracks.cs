@@ -16,9 +16,9 @@ public class DrawTracks : MonoBehaviour
 
     //[SerializeField] Transform transformObject;
 
-    private RenderTexture _splatmap;
-    private Material _snowMaterial;
-    private RaycastHit hit;
+    public RenderTexture _splatmap;
+    public Material _snowMaterial;
+    public RaycastHit hit;
 
     public virtual void Start()
     {
@@ -44,29 +44,12 @@ public class DrawTracks : MonoBehaviour
     {
         foreach (Transform interactionObject in interactionObjects)
         {
-            MeshCollider collider = interactionObject.gameObject.GetComponent<SnowInteractionObject>().meshCollider;
-            Vector3[] normals = collider.sharedMesh.normals;
-
-            foreach (Vector3 positionNormal in normals)
-            {
-                if (Physics.Raycast(positionNormal, -Vector3.up, out hit))
-                {
-                    SnowInteractionObject snowInteractionObject = interactionObject.GetComponent<SnowInteractionObject>();
-                    snowInteractionObject._drawMaterial.SetVector
-                        ("_Coordinate", new Vector4(hit.textureCoord.x, hit.textureCoord.y, 0, 0));
-                    RenderTexture temp = RenderTexture.GetTemporary(_splatmap.width, _splatmap.height, 0, RenderTextureFormat.ARGBFloat);
-                    Graphics.Blit(_splatmap, temp);
-                    Graphics.Blit(temp, _splatmap, snowInteractionObject._drawMaterial);
-
-                    //Remove it from memory
-                    RenderTexture.ReleaseTemporary(temp);
-                }
-            }
-
-            /*
             if (Physics.Raycast(interactionObject.transform.position, -Vector3.up, out hit))
             {
                 SnowInteractionObject snowInteractionObject = interactionObject.GetComponent<SnowInteractionObject>();
+                if (!snowInteractionObject.onSnow)
+                    return;
+
                 snowInteractionObject._drawMaterial.SetVector
                     ("_Coordinate", new Vector4(hit.textureCoord.x, hit.textureCoord.y, 0, 0));
                 RenderTexture temp = RenderTexture.GetTemporary(_splatmap.width, _splatmap.height, 0, RenderTextureFormat.ARGBFloat);
@@ -76,27 +59,7 @@ public class DrawTracks : MonoBehaviour
                 //Remove it from memory
                 RenderTexture.ReleaseTemporary(temp);
             }
-            */
         }
-    }
-
-    private Vector3 GetMeshColliderNormal(RaycastHit hit)
-    {
-        MeshCollider collider = hit.collider.gameObject.GetComponent<SnowInteractionObject>().meshCollider;
-        Mesh mesh = collider.sharedMesh;
-        Vector3[] normals = mesh.normals;
-        int[] triangles = mesh.triangles;
-
-
-        Vector3 n0 = normals[triangles[hit.triangleIndex * 3 + 0]];
-        Vector3 n1 = normals[triangles[hit.triangleIndex * 3 + 1]];
-        Vector3 n2 = normals[triangles[hit.triangleIndex * 3 + 2]];
-        Vector3 baryCenter = hit.barycentricCoordinate;
-        Vector3 interpolatedNormal = n0 * baryCenter.x + n1 * baryCenter.y + n2 * baryCenter.z;
-        interpolatedNormal.Normalize();
-        interpolatedNormal = hit.transform.TransformDirection(interpolatedNormal);
-        return interpolatedNormal;
-
     }
 
     private void OnGUI()

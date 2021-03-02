@@ -43,7 +43,7 @@ Material:
     - _Displacement: 0.078
     - _Glossiness: 0.5
     - _Metallic: 0
-    - _Tess: 12.5
+    - _Tess: 64
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _GroundColor: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 1}
