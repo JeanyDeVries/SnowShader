@@ -6,9 +6,9 @@ public class SnowInteractionObject : DrawTracks
 {
     public float widthTrailObject;
     public float opacityTrailObject;
-    public Collider colliderObject;
+    [HideInInspector] public Collider colliderObject;
 
-    public bool onSnow;
+    [HideInInspector] public bool onSnow;
 
     public override void Start()
     {

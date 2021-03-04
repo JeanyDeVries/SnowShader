@@ -5,20 +5,19 @@ using UnityEngine;
 public class DrawTracks : MonoBehaviour
 {
     public Camera _camera;
+    public Shader _drawShader;
+
 
     [HideInInspector] public Material _drawMaterial;
-    [HideInInspector] public Shader _drawShader;
     [HideInInspector] public float widthTrail;
     [HideInInspector] public float opacityTrail;
 
     [HideInInspector] public Transform[] interactionObjects;
     [HideInInspector] public List<Collider> collidors;
 
-    //[SerializeField] Transform transformObject;
-
-    public RenderTexture _splatmap;
-    public Material _snowMaterial;
-    public RaycastHit hit;
+    private RenderTexture _splatmap;
+    private Material _snowMaterial;
+    private RaycastHit hit;
 
     public virtual void Start()
     {
@@ -30,7 +29,8 @@ public class DrawTracks : MonoBehaviour
             SnowInteractionObject snowInteractionObject = interactionObjects[i].GetComponent<SnowInteractionObject>();
 
             snowInteractionObject._drawMaterial = new Material(_drawShader);
-            snowInteractionObject._drawMaterial.SetVector("_Color", Color.red);
+            snowInteractionObject._drawMaterial.SetVector("_Color",
+                snowInteractionObject.GetComponent<MeshRenderer>().material.GetFloat("_Opacity") * Color.red);
             snowInteractionObject._drawMaterial.SetFloat("_WidthTrail", snowInteractionObject.widthTrailObject);
             snowInteractionObject._drawMaterial.SetFloat("_OpacityTrail", snowInteractionObject.opacityTrailObject);
         }
@@ -58,6 +58,7 @@ public class DrawTracks : MonoBehaviour
 
                 //Remove it from memory
                 RenderTexture.ReleaseTemporary(temp);
+                _camera.targetTexture = temp;
             }
         }
     }

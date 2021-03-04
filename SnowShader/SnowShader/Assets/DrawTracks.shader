@@ -31,12 +31,17 @@
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float4 worldPos : TEXCOORD4;
             };
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
             fixed4 _Coordinate;
             fixed4 _Color;
+
+            uniform float3 _Position;
+            uniform sampler2D _GlobalEffectRT;
+            uniform float _OrthographicCamSize;
 
             v2f vert (appdata v)
             {
@@ -53,11 +58,18 @@
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
 
-                //Check distance between the uv and the coordinate (clamped between 0 and 1)
+                float2 uv = i.worldPos.xz - _Position.xz;
+                uv = uv / (_OrthographicCamSize * 2);
+                uv += 0.5;
+
+                float steps = tex2D(_GlobalEffectRT, uv).r;
+                steps = step(0.99, steps * 3);
+
                 float draw = pow(saturate(1 - distance(i.uv, _Coordinate.xy)), _WidthTrail);
                 fixed4 drawcol = _Color * (draw * _OpacityTrail);
                 return saturate(col + drawcol);
             }
+
             ENDCG
         }
     }
